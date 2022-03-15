@@ -10,33 +10,30 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * This class is automatically generated to help creating config.
- *
- * @experimental in 5.3
  */
 class DoctrineMigrationsConfig implements \Symfony\Component\Config\Builder\ConfigBuilderInterface
 {
-    private $name;
     private $migrationsPaths;
+    private $services;
+    private $factories;
     private $storage;
-    private $dirName;
-    private $namespace;
-    private $tableName;
-    private $columnName;
-    private $columnLength;
-    private $executedAtColumnName;
+    private $migrations;
+    private $connection;
+    private $em;
     private $allOrNothing;
+    private $checkDatabasePlatform;
     private $customTemplate;
     private $organizeMigrations;
+    private $enableProfiler;
+    private $transactional;
     
     /**
-     * @default 'Application Migrations'
      * @param ParamConfigurator|mixed $value
-     * @deprecated The "name" option is deprecated.
      * @return $this
      */
-    public function name($value): self
+    public function migrationsPath(string $namespace, $value): self
     {
-        $this->name = $value;
+        $this->migrationsPaths[$namespace] = $value;
     
         return $this;
     }
@@ -45,9 +42,20 @@ class DoctrineMigrationsConfig implements \Symfony\Component\Config\Builder\Conf
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function migrationsPaths(string $name, $value): self
+    public function services(string $service, $value): self
     {
-        $this->migrationsPaths[$name] = $value;
+        $this->services[$service] = $value;
+    
+        return $this;
+    }
+    
+    /**
+     * @param ParamConfigurator|mixed $value
+     * @return $this
+     */
+    public function factories(string $factory, $value): self
+    {
+        $this->factories[$factory] = $value;
     
         return $this;
     }
@@ -64,84 +72,44 @@ class DoctrineMigrationsConfig implements \Symfony\Component\Config\Builder\Conf
     }
     
     /**
-     * @default '%kernel.root_dir%/DoctrineMigrations'
-     * @param ParamConfigurator|mixed $value
-     * @deprecated The "dir_name" option is deprecated. Use "migrations_paths" instead.
+     * @param ParamConfigurator|list<mixed|ParamConfigurator> $value
      * @return $this
      */
-    public function dirName($value): self
+    public function migrations($value): self
     {
-        $this->dirName = $value;
+        $this->migrations = $value;
     
         return $this;
     }
     
     /**
-     * @default 'Application\\Migrations'
+     * Connection name to use for the migrations database.
+     * @default null
      * @param ParamConfigurator|mixed $value
-     * @deprecated The "namespace" option is deprecated. Use "migrations_paths" instead.
      * @return $this
      */
-    public function namespace($value): self
+    public function connection($value): self
     {
-        $this->namespace = $value;
+        $this->connection = $value;
     
         return $this;
     }
     
     /**
-     * @default 'migration_versions'
+     * Entity manager name to use for the migrations database (available when doctrine/orm is installed).
+     * @default null
      * @param ParamConfigurator|mixed $value
-     * @deprecated The "table_name" option is deprecated. Use "storage.table_storage.table_name" instead.
      * @return $this
      */
-    public function tableName($value): self
+    public function em($value): self
     {
-        $this->tableName = $value;
+        $this->em = $value;
     
         return $this;
     }
     
     /**
-     * @default 'version'
-     * @param ParamConfigurator|mixed $value
-     * @deprecated The "column_name" option is deprecated. Use "storage.table_storage.version_column_name" instead.
-     * @return $this
-     */
-    public function columnName($value): self
-    {
-        $this->columnName = $value;
-    
-        return $this;
-    }
-    
-    /**
-     * @default 14
-     * @param ParamConfigurator|mixed $value
-     * @deprecated The "column_length" option is deprecated. Use "storage.table_storage.version_column_length" instead.
-     * @return $this
-     */
-    public function columnLength($value): self
-    {
-        $this->columnLength = $value;
-    
-        return $this;
-    }
-    
-    /**
-     * @default 'executed_at'
-     * @param ParamConfigurator|mixed $value
-     * @deprecated The "executed_at_column_name" option is deprecated. Use "storage.table_storage.executed_at_column_name" instead.
-     * @return $this
-     */
-    public function executedAtColumnName($value): self
-    {
-        $this->executedAtColumnName = $value;
-    
-        return $this;
-    }
-    
-    /**
+     * Run all migrations in a transaction.
      * @default false
      * @param ParamConfigurator|mixed $value
      * @return $this
@@ -154,6 +122,20 @@ class DoctrineMigrationsConfig implements \Symfony\Component\Config\Builder\Conf
     }
     
     /**
+     * Adds an extra check in the generated migrations to allow execution only on the same platform as they were initially generated on.
+     * @default true
+     * @param ParamConfigurator|mixed $value
+     * @return $this
+     */
+    public function checkDatabasePlatform($value): self
+    {
+        $this->checkDatabasePlatform = $value;
+    
+        return $this;
+    }
+    
+    /**
+     * Custom template path for generated migration classes.
      * @default null
      * @param ParamConfigurator|mixed $value
      * @return $this
@@ -178,23 +160,53 @@ class DoctrineMigrationsConfig implements \Symfony\Component\Config\Builder\Conf
         return $this;
     }
     
+    /**
+     * Use profiler to calculate and visualize migration status.
+     * @default false
+     * @param ParamConfigurator|bool $value
+     * @return $this
+     */
+    public function enableProfiler($value): self
+    {
+        $this->enableProfiler = $value;
+    
+        return $this;
+    }
+    
+    /**
+     * Whether or not to wrap migrations in a single transaction.
+     * @default true
+     * @param ParamConfigurator|bool $value
+     * @return $this
+     */
+    public function transactional($value): self
+    {
+        $this->transactional = $value;
+    
+        return $this;
+    }
+    
     public function getExtensionAlias(): string
     {
         return 'doctrine_migrations';
     }
-            
     
     public function __construct(array $value = [])
     {
     
-        if (isset($value['name'])) {
-            $this->name = $value['name'];
-            unset($value['name']);
-        }
-    
         if (isset($value['migrations_paths'])) {
             $this->migrationsPaths = $value['migrations_paths'];
             unset($value['migrations_paths']);
+        }
+    
+        if (isset($value['services'])) {
+            $this->services = $value['services'];
+            unset($value['services']);
+        }
+    
+        if (isset($value['factories'])) {
+            $this->factories = $value['factories'];
+            unset($value['factories']);
         }
     
         if (isset($value['storage'])) {
@@ -202,39 +214,29 @@ class DoctrineMigrationsConfig implements \Symfony\Component\Config\Builder\Conf
             unset($value['storage']);
         }
     
-        if (isset($value['dir_name'])) {
-            $this->dirName = $value['dir_name'];
-            unset($value['dir_name']);
+        if (isset($value['migrations'])) {
+            $this->migrations = $value['migrations'];
+            unset($value['migrations']);
         }
     
-        if (isset($value['namespace'])) {
-            $this->namespace = $value['namespace'];
-            unset($value['namespace']);
+        if (isset($value['connection'])) {
+            $this->connection = $value['connection'];
+            unset($value['connection']);
         }
     
-        if (isset($value['table_name'])) {
-            $this->tableName = $value['table_name'];
-            unset($value['table_name']);
-        }
-    
-        if (isset($value['column_name'])) {
-            $this->columnName = $value['column_name'];
-            unset($value['column_name']);
-        }
-    
-        if (isset($value['column_length'])) {
-            $this->columnLength = $value['column_length'];
-            unset($value['column_length']);
-        }
-    
-        if (isset($value['executed_at_column_name'])) {
-            $this->executedAtColumnName = $value['executed_at_column_name'];
-            unset($value['executed_at_column_name']);
+        if (isset($value['em'])) {
+            $this->em = $value['em'];
+            unset($value['em']);
         }
     
         if (isset($value['all_or_nothing'])) {
             $this->allOrNothing = $value['all_or_nothing'];
             unset($value['all_or_nothing']);
+        }
+    
+        if (isset($value['check_database_platform'])) {
+            $this->checkDatabasePlatform = $value['check_database_platform'];
+            unset($value['check_database_platform']);
         }
     
         if (isset($value['custom_template'])) {
@@ -247,44 +249,50 @@ class DoctrineMigrationsConfig implements \Symfony\Component\Config\Builder\Conf
             unset($value['organize_migrations']);
         }
     
+        if (isset($value['enable_profiler'])) {
+            $this->enableProfiler = $value['enable_profiler'];
+            unset($value['enable_profiler']);
+        }
+    
+        if (isset($value['transactional'])) {
+            $this->transactional = $value['transactional'];
+            unset($value['transactional']);
+        }
+    
         if ([] !== $value) {
             throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
         }
     }
     
-    
     public function toArray(): array
     {
         $output = [];
-        if (null !== $this->name) {
-            $output['name'] = $this->name;
-        }
         if (null !== $this->migrationsPaths) {
             $output['migrations_paths'] = $this->migrationsPaths;
+        }
+        if (null !== $this->services) {
+            $output['services'] = $this->services;
+        }
+        if (null !== $this->factories) {
+            $output['factories'] = $this->factories;
         }
         if (null !== $this->storage) {
             $output['storage'] = $this->storage->toArray();
         }
-        if (null !== $this->dirName) {
-            $output['dir_name'] = $this->dirName;
+        if (null !== $this->migrations) {
+            $output['migrations'] = $this->migrations;
         }
-        if (null !== $this->namespace) {
-            $output['namespace'] = $this->namespace;
+        if (null !== $this->connection) {
+            $output['connection'] = $this->connection;
         }
-        if (null !== $this->tableName) {
-            $output['table_name'] = $this->tableName;
-        }
-        if (null !== $this->columnName) {
-            $output['column_name'] = $this->columnName;
-        }
-        if (null !== $this->columnLength) {
-            $output['column_length'] = $this->columnLength;
-        }
-        if (null !== $this->executedAtColumnName) {
-            $output['executed_at_column_name'] = $this->executedAtColumnName;
+        if (null !== $this->em) {
+            $output['em'] = $this->em;
         }
         if (null !== $this->allOrNothing) {
             $output['all_or_nothing'] = $this->allOrNothing;
+        }
+        if (null !== $this->checkDatabasePlatform) {
+            $output['check_database_platform'] = $this->checkDatabasePlatform;
         }
         if (null !== $this->customTemplate) {
             $output['custom_template'] = $this->customTemplate;
@@ -292,9 +300,14 @@ class DoctrineMigrationsConfig implements \Symfony\Component\Config\Builder\Conf
         if (null !== $this->organizeMigrations) {
             $output['organize_migrations'] = $this->organizeMigrations;
         }
+        if (null !== $this->enableProfiler) {
+            $output['enable_profiler'] = $this->enableProfiler;
+        }
+        if (null !== $this->transactional) {
+            $output['transactional'] = $this->transactional;
+        }
     
         return $output;
     }
-    
 
 }

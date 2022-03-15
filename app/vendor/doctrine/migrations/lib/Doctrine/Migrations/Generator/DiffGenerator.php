@@ -10,8 +10,9 @@ use Doctrine\DBAL\Schema\AbstractAsset;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
-use Doctrine\Migrations\Provider\SchemaProviderInterface;
+use Doctrine\Migrations\Provider\SchemaProvider;
 
+use function method_exists;
 use function preg_match;
 use function strpos;
 use function substr;
@@ -27,10 +28,10 @@ class DiffGenerator
     /** @var DBALConfiguration */
     private $dbalConfiguration;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager<AbstractPlatform> */
     private $schemaManager;
 
-    /** @var SchemaProviderInterface */
+    /** @var SchemaProvider */
     private $schemaProvider;
 
     /** @var AbstractPlatform */
@@ -42,17 +43,20 @@ class DiffGenerator
     /** @var SqlGenerator */
     private $migrationSqlGenerator;
 
-    /** @var SchemaProviderInterface */
+    /** @var SchemaProvider */
     private $emptySchemaProvider;
 
+    /**
+     * @param AbstractSchemaManager<AbstractPlatform> $schemaManager
+     */
     public function __construct(
         DBALConfiguration $dbalConfiguration,
         AbstractSchemaManager $schemaManager,
-        SchemaProviderInterface $schemaProvider,
+        SchemaProvider $schemaProvider,
         AbstractPlatform $platform,
         Generator $migrationGenerator,
         SqlGenerator $migrationSqlGenerator,
-        SchemaProviderInterface $emptySchemaProvider
+        SchemaProvider $emptySchemaProvider
     ) {
         $this->dbalConfiguration     = $dbalConfiguration;
         $this->schemaManager         = $schemaManager;
@@ -67,7 +71,7 @@ class DiffGenerator
      * @throws NoChangesDetected
      */
     public function generate(
-        string $versionNumber,
+        string $fqcn,
         ?string $filterExpression,
         bool $formatted = false,
         int $lineLength = 120,
@@ -92,15 +96,27 @@ class DiffGenerator
 
         $toSchema = $this->createToSchema();
 
+        if (method_exists($this->schemaManager, 'createComparator')) {
+            $comparator = $this->schemaManager->createComparator();
+        }
+
+        $upSql = isset($comparator) ?
+            $comparator->compareSchemas($fromSchema, $toSchema)->toSql($this->platform) :
+            $fromSchema->getMigrateToSql($toSchema, $this->platform);
+
         $up = $this->migrationSqlGenerator->generate(
-            $fromSchema->getMigrateToSql($toSchema, $this->platform),
+            $upSql,
             $formatted,
             $lineLength,
             $checkDbPlatform
         );
 
+        $downSql = isset($comparator) ?
+            $comparator->compareSchemas($toSchema, $fromSchema)->toSql($this->platform) :
+            $fromSchema->getMigrateFromSql($toSchema, $this->platform);
+
         $down = $this->migrationSqlGenerator->generate(
-            $fromSchema->getMigrateFromSql($toSchema, $this->platform),
+            $downSql,
             $formatted,
             $lineLength,
             $checkDbPlatform
@@ -111,7 +127,7 @@ class DiffGenerator
         }
 
         return $this->migrationGenerator->generateMigration(
-            $versionNumber,
+            $fqcn,
             $up,
             $down
         );

@@ -9,15 +9,13 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * This class is automatically generated to help creating config.
- *
- * @experimental in 5.3
  */
 class PropertyInfoConfig 
 {
     private $enabled;
     
     /**
-     * @default true
+     * @default false
      * @param ParamConfigurator|bool $value
      * @return $this
      */
@@ -41,7 +39,6 @@ class PropertyInfoConfig
         }
     }
     
-    
     public function toArray(): array
     {
         $output = [];
@@ -51,6 +48,5 @@ class PropertyInfoConfig
     
         return $output;
     }
-    
 
 }

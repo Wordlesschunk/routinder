@@ -20,7 +20,7 @@ use function usort;
  *
  * @internal
  */
-final class OrmSchemaProvider implements SchemaProviderInterface
+final class OrmSchemaProvider implements SchemaProvider
 {
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -35,13 +35,14 @@ final class OrmSchemaProvider implements SchemaProviderInterface
      */
     public function createSchema(): Schema
     {
+        /** @var array<int, ClassMetadata<object>> $metadata */
         $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
 
         if (count($metadata) === 0) {
             throw NoMappingFound::new();
         }
 
-        usort($metadata, static function (ClassMetadata $a, ClassMetadata $b) {
+        usort($metadata, static function (ClassMetadata $a, ClassMetadata $b): int {
             return $a->getTableName() <=> $b->getTableName();
         });
 

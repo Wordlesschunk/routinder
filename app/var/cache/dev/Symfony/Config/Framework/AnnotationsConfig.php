@@ -9,8 +9,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * This class is automatically generated to help creating config.
- *
- * @experimental in 5.3
  */
 class AnnotationsConfig 
 {
@@ -20,7 +18,7 @@ class AnnotationsConfig
     private $debug;
     
     /**
-     * @default true
+     * @default false
      * @param ParamConfigurator|bool $value
      * @return $this
      */
@@ -32,7 +30,7 @@ class AnnotationsConfig
     }
     
     /**
-     * @default 'php_array'
+     * @default 'none'
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
@@ -95,7 +93,6 @@ class AnnotationsConfig
         }
     }
     
-    
     public function toArray(): array
     {
         $output = [];
@@ -114,6 +111,5 @@ class AnnotationsConfig
     
         return $output;
     }
-    
 
 }

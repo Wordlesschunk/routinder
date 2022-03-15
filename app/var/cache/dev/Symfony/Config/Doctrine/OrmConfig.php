@@ -10,8 +10,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * This class is automatically generated to help creating config.
- *
- * @experimental in 5.3
  */
 class OrmConfig 
 {
@@ -35,7 +33,7 @@ class OrmConfig
     }
     
     /**
-     * Auto generate mode possible values are: "NEVER", "ALWAYS", "FILE_NOT_EXISTS", "EVAL"
+     * Auto generate mode possible values are: "NEVER", "ALWAYS", "FILE_NOT_EXISTS", "EVAL", "FILE_NOT_EXISTS_OR_CHANGED"
      * @default false
      * @param ParamConfigurator|mixed $value
      * @return $this
@@ -132,7 +130,6 @@ class OrmConfig
         }
     }
     
-    
     public function toArray(): array
     {
         $output = [];
@@ -157,6 +154,5 @@ class OrmConfig
     
         return $output;
     }
-    
 
 }

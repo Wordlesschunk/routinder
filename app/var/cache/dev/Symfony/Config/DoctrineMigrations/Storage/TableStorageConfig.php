@@ -9,8 +9,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * This class is automatically generated to help creating config.
- *
- * @experimental in 5.3
  */
 class TableStorageConfig 
 {
@@ -18,6 +16,7 @@ class TableStorageConfig
     private $versionColumnName;
     private $versionColumnLength;
     private $executedAtColumnName;
+    private $executionTimeColumnName;
     
     /**
      * @default null
@@ -67,6 +66,18 @@ class TableStorageConfig
         return $this;
     }
     
+    /**
+     * @default null
+     * @param ParamConfigurator|mixed $value
+     * @return $this
+     */
+    public function executionTimeColumnName($value): self
+    {
+        $this->executionTimeColumnName = $value;
+    
+        return $this;
+    }
+    
     public function __construct(array $value = [])
     {
     
@@ -90,11 +101,15 @@ class TableStorageConfig
             unset($value['executed_at_column_name']);
         }
     
+        if (isset($value['execution_time_column_name'])) {
+            $this->executionTimeColumnName = $value['execution_time_column_name'];
+            unset($value['execution_time_column_name']);
+        }
+    
         if ([] !== $value) {
             throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
         }
     }
-    
     
     public function toArray(): array
     {
@@ -111,9 +126,11 @@ class TableStorageConfig
         if (null !== $this->executedAtColumnName) {
             $output['executed_at_column_name'] = $this->executedAtColumnName;
         }
+        if (null !== $this->executionTimeColumnName) {
+            $output['execution_time_column_name'] = $this->executionTimeColumnName;
+        }
     
         return $output;
     }
-    
 
 }

@@ -96,8 +96,7 @@ EOT
     {
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
-        $targetArg = rtrim($input->getArgument('target'), '/');
-
+        $targetArg = rtrim($input->getArgument('target') ?? '', '/');
         if (!$targetArg) {
             $targetArg = $this->getPublicDirectory($kernel->getContainer());
         }
@@ -233,7 +232,7 @@ EOT
     /**
      * Creates symbolic link.
      *
-     * @throws IOException if link can not be created
+     * @throws IOException if link cannot be created
      */
     private function symlink(string $originDir, string $targetDir, bool $relative = false)
     {
