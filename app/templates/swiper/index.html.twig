@@ -220,6 +220,14 @@
                 tinderContainer.classList.toggle('tinder_love', event.deltaX > 0);
                 tinderContainer.classList.toggle('tinder_nope', event.deltaX < 0);
 
+                if (event.deltaX < 0) {
+
+                    const nodeList = document.querySelectorAll(".moving");
+                    for (let i = 0; i < nodeList.length; i++) {
+                        nodeList[i].style.backgroundColor = "red";
+                    }
+                }
+
                 var xMulti = event.deltaX * 0.03;
                 var yMulti = event.deltaY / 80;
                 var rotate = xMulti * yMulti;
@@ -248,9 +256,9 @@
                     var yMulti = event.deltaY / 80;
                     var rotate = xMulti * yMulti;
 
-                    console.log(document.querySelectorAll("div.tinder--card:not(.removed)"));
-                    //ajax needs to be done at this point to prevent any miss submits
-                    console.log('added to db');
+                    // console.log(document.querySelectorAll(".tinder--card:not(.removed)")[0]);
+                    // ajax needs to be done at this point to prevent any miss submits
+                    // console.log('added to db');
 
                     event.target.style.transform = 'translate(' + toX + 'px, ' + (toY + event.deltaY) + 'px) rotate(' + rotate + 'deg)';
                     initCards();
